@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 type AppointmentStatus = "bekliyor" | "koltukta" | "tamamlandi" | "gelmedi";
@@ -308,11 +309,11 @@ export default function Home() {
                 const { rozet } = durumRenkleri(r.status);
                 const sec = r.id === seciliId;
                 return (
-                  <li key={r.id}>
+                  <li key={r.id} className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => setSeciliId(r.id)}
-                      className={`flex w-full flex-col gap-1 rounded-xl border px-3 py-2.5 text-left transition ${
+                      className={`flex min-w-0 flex-1 flex-col gap-1 rounded-xl border px-3 py-2.5 text-left transition ${
                         sec
                           ? "border-teal-500 bg-teal-50 shadow-sm ring-1 ring-teal-500/30 dark:border-teal-500 dark:bg-teal-950/30"
                           : "border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600"
@@ -363,6 +364,12 @@ export default function Home() {
                         </div>
                       )}
                     </button>
+                    <Link
+                      href={`/hasta?id=${r.id}`}
+                      className="flex w-[4.5rem] shrink-0 items-center justify-center rounded-xl border border-teal-200 bg-teal-50 text-center text-xs font-semibold text-teal-800 shadow-sm transition hover:border-teal-300 hover:bg-teal-100 dark:border-teal-800 dark:bg-teal-950/50 dark:text-teal-200 dark:hover:bg-teal-900/40"
+                    >
+                      Profil
+                    </Link>
                   </li>
                 );
               })}
@@ -426,24 +433,40 @@ export default function Home() {
                     const { kart, kenar } = durumRenkleri(r.status);
                     const sec = r.id === seciliId;
                     return (
-                      <button
+                      <div
                         key={r.id}
-                        type="button"
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setSeciliId(r.id);
+                          }
+                        }}
                         onClick={() => setSeciliId(r.id)}
                         style={{ top, height: Math.max(height - 4, 28), left: 8, right: 8 }}
-                        className={`absolute flex flex-col gap-0.5 overflow-hidden rounded-lg px-2 py-1.5 text-left text-xs shadow-md ring-1 transition hover:brightness-105 ${kart} ${kenar} ${sec ? "ring-2 ring-teal-400 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900" : ""}`}
+                        className={`absolute flex cursor-pointer flex-col gap-0.5 overflow-hidden rounded-lg px-2 py-1.5 text-left text-xs shadow-md ring-1 transition hover:brightness-105 ${kart} ${kenar} ${sec ? "ring-2 ring-teal-400 ring-offset-2 ring-offset-white dark:ring-offset-zinc-900" : ""}`}
                       >
-                        <span className="truncate font-semibold">
-                          {r.patientName}
-                          {r.hicGelmedi && (
-                            <span className="ml-1 inline-block h-2 w-2 shrink-0 rounded-full bg-red-200 ring-1 ring-red-800/30" />
-                          )}
-                        </span>
+                        <div className="flex items-start justify-between gap-1">
+                          <span className="min-w-0 truncate font-semibold">
+                            {r.patientName}
+                            {r.hicGelmedi && (
+                              <span className="ml-1 inline-block h-2 w-2 shrink-0 rounded-full bg-red-200 ring-1 ring-red-800/30" />
+                            )}
+                          </span>
+                          <Link
+                            href={`/hasta?id=${r.id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="shrink-0 rounded bg-black/15 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wide text-inherit ring-1 ring-black/10 hover:bg-black/25"
+                          >
+                            Profil
+                          </Link>
+                        </div>
                         <span className="truncate opacity-90">{r.procedure}</span>
                         <span className="tabular-nums opacity-80">
                           {r.start} – {bitisSaati(r.start, r.durationMinutes)}
                         </span>
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -470,6 +493,12 @@ export default function Home() {
                       <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
                         {secili.patientName}
                       </h3>
+                      <Link
+                        href={`/hasta?id=${secili.id}`}
+                        className="text-xs font-semibold text-teal-600 hover:underline dark:text-teal-400"
+                      >
+                        Hasta profili →
+                      </Link>
                       {secili.hicGelmedi && (
                         <span className="rounded-md bg-red-600 px-2 py-0.5 text-[11px] font-semibold text-white">
                           Hiç gelmemiş
