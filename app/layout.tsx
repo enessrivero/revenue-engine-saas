@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Diş Kliniği Randevu Sistemi",
+  title: "Dentin",
   description: "Diş klinikleri için randevu yönetimi",
 };
 
