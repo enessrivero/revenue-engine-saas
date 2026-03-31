@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revenic — AI Revenue Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface2: #f0f1f4;
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.14);
+    --text: #1a1d23;
+    --muted: #8a8f9e;
+    --accent: #2563eb;
+    --accent2: #3b82f6;
+    --green: #16a34a;
+    --green-dim: rgba(22,163,74,0.09);
+    --red: #dc2626;
+    --red-dim: rgba(220,38,38,0.08);
+    --amber: #b45309;
+    --amber-dim: rgba(180,83,9,0.08);
+    --teal: #0d7377;
+    --teal-dim: rgba(13,115,119,0.09);
+    --purple-dim: rgba(37,99,235,0.08);
+    --radius: 10px;
+    --radius-sm: 7px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    z-index: 100;
+  }
+
+  .logo {
+    padding: 0 24px 28px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+
+  .logo-mark {
+    font-family: 'Syne', sans-serif;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .logo-mark span {
+    color: var(--accent2);
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .nav-section {
+    padding: 8px 12px;
+    margin-bottom: 4px;
+  }
+
+  .nav-label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 12px;
+    margin-bottom: 4px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    font-size: 13.5px;
+    font-weight: 400;
+    color: var(--muted);
+    user-select: none;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+
+  .nav-item.active {
+    background: var(--purple-dim);
+    color: var(--accent2);
+    font-weight: 500;
+  }
+
+  .nav-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  .nav-item.active .nav-icon { opacity: 1; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 12px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .clinic-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+  }
+
+  .clinic-avatar {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, var(--accent), var(--teal));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .clinic-name { font-size: 12px; font-weight: 500; color: var(--text); }
+  .clinic-plan { font-size: 10px; color: var(--muted); }
+  /* MAIN */
+  .main {
+    margin-left: 220px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    height: 60px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .topbar-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topbar-subtitle {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .period-selector {
+    display: flex;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    gap: 2px;
+  }
+
+  .period-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.15s;
+    font-family: 'DM Mono', monospace;
+    background: none;
+    border: none;
+  }
+
+  .period-btn.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  .ai-pulse {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--purple-dim);
+    border: 1px solid rgba(124,92,252,0.25);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 11px;
+    color: var(--accent2);
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent2);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* CONTENT */
+  .content {
+    padding: 28px 32px;
+    flex: 1;
+  }
+
+  /* AI INSIGHT BANNER */
+  .ai-banner {
+    background: linear-gradient(135deg, rgba(37,99,235,0.07), rgba(13,115,119,0.05));
+    border: 1px solid rgba(37,99,235,0.16);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .ai-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--purple-dim);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .ai-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .ai-text strong { color: var(--accent2); font-weight: 500; }
+  .ai-text span { color: var(--muted); font-size: 12px; }
+
+  .ai-action {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 7px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    transition: opacity 0.15s;
+    flex-shrink: 0;
+  }
+  .ai-action:hover { opacity: 0.85; }
+
+  /* KPI GRID — HERO */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+    cursor: default;
+  }
+
+  .kpi-card:hover { border-color: var(--border2); }
+
+  .kpi-card.hero {
+    background: linear-gradient(135deg, rgba(37,99,235,0.07), rgba(37,99,235,0.03));
+    border-color: rgba(37,99,235,0.18);
+    grid-column: span 2;
+  }
+
+  .kpi-label {
+    font-size: 11px;
+    color: #5a6072;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .kpi-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+
+  .kpi-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f1117;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .kpi-card.hero .kpi-value { font-size: 34px; letter-spacing: -1px; }
+
+  .kpi-delta {
+    font-size: 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .kpi-delta.up { color: #15803d; }
+  .kpi-delta.down { color: #b91c1c; }
+  .kpi-delta.neutral { color: var(--muted); }
+
+  .kpi-sub {
+    font-size: 11.5px;
+    color: #7a8299;
+    margin-top: 3px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+  }
+
+  /* SPARKLINE */
+  .sparkline {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 100px;
+    height: 50px;
+    opacity: 0.35;
+  }
+
+  /* SECTION ROW */
+  .section-row {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .section-row.two-three { grid-template-columns: 2fr 3fr; }
+  .section-row.three-two { grid-template-columns: 3fr 2fr; }
+  .section-row.equal { grid-template-columns: 1fr 1fr 1fr; }
+  .section-row.half { grid-template-columns: 1fr 1fr; }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0f1117;
+  }
+
+  .card-badge {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .card-badge.green { background: var(--green-dim); color: var(--green); }
+  .card-badge.amber { background: var(--amber-dim); color: var(--amber); }
+  .card-badge.purple { background: var(--purple-dim); color: var(--accent2); }
+  .card-badge.red { background: var(--red-dim); color: var(--red); }
+  .card-badge.teal { background: var(--teal-dim); color: var(--teal); }
+
+  .card-body { padding: 20px; }
+
+  /* CHART CONTAINER */
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  /* REVENUE FUNNEL */
+  .funnel-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .funnel-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .funnel-label {
+    font-size: 11px;
+    color: var(--muted);
+    width: 110px;
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .funnel-bar-wrap {
+    flex: 1;
+    height: 26px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .funnel-bar {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    color: #fff;
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .funnel-amount {
+    font-size: 12.5px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: #0f1117;
+    width: 80px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* APPOINTMENT TABLE */
+  .apt-table { width: 100%; border-collapse: collapse; }
+  .apt-table th {
+    font-size: 10.5px;
+    color: #5a6072;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 0 0 12px;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+  .apt-table td {
+    padding: 11px 0;
+    font-size: 12.5px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    vertical-align: middle;
+  }
+  .apt-table tr:last-child td { border-bottom: none; }
+
+  .patient-name { font-weight: 700; color: #0f1117; font-size: 13px; }
+  .patient-meta { font-size: 10.5px; color: #8a8f9e; margin-top: 1px; font-family: 'Inter', sans-serif; font-weight: 400; }
+
+  .status-pill {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+  }
+
+  .status-pill.confirmed { background: var(--green-dim); color: var(--green); }
+  .status-pill.risk { background: var(--red-dim); color: var(--red); }
+  .status-pill.pending { background: var(--amber-dim); color: var(--amber); }
+  .status-pill.opportunity { background: var(--purple-dim); color: var(--accent2); }
+
+  .ltv-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #0f1117;
+    letter-spacing: -0.2px;
+  }
+
+  .ltv-tier {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  /* OPPORTUNITY CARD */
+  .opp-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .opp-item {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .opp-item:hover { border-color: var(--border2); }
+
+  .opp-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .opp-title { font-size: 12.5px; font-weight: 500; color: var(--text); }
+  .opp-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .opp-amount {
+    margin-left: auto;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .opp-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    color: #15803d;
+    letter-spacing: -0.3px;
+  }
+
+  .opp-label { font-size: 10px; color: var(--muted); }
+
+  /* METRIC MINI CARDS */
+  .mini-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .mini-card {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+  }
+
+  .mini-label {
+    font-size: 10.5px;
+    color: #5a6072;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 6px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+  }
+
+  .mini-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 19px;
+    font-weight: 800;
+    color: #0f1117;
+    letter-spacing: -0.3px;
+  }
+
+  .mini-delta {
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    margin-top: 3px;
+  }
+
+  /* DONUT */
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .legend-name { font-size: 12px; color: var(--muted); flex: 1; }
+  .legend-pct { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text); }
+
+  /* NOSHOW TABLE */
+  .ns-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    gap: 10px;
+  }
+  .ns-row:last-child { border-bottom: none; }
+
+  .ns-day { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; width: 36px; flex-shrink: 0; }
+
+  .ns-bar-wrap { flex: 1; height: 18px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .ns-bar { height: 100%; border-radius: 3px; background: var(--red); opacity: 0.7; }
+
+  .ns-val { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text); width: 28px; text-align: right; flex-shrink: 0; }
+
+  /* ALERT STRIP */
+  .alert-strip {
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.2);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .alert-strip-text { font-size: 12px; color: var(--amber); }
+  .alert-strip-text strong { font-weight: 500; }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .kpi-card { animation: fadeIn 0.4s ease both; }
+  .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+  .kpi-card:nth-child(2) { animation-delay: 0.1s; }
+  .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+  .kpi-card:nth-child(4) { animation-delay: 0.2s; }
+  .kpi-card:nth-child(5) { animation-delay: 0.25s; }
+  .kpi-card:nth-child(6) { animation-delay: 0.3s; }
+
+  /* OCCUPANCY RING */
+  .ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .ring-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f1117;
+    letter-spacing: -0.5px;
+  }
+
+  .ring-label { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* CHAIR GRID */
+  .chair-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+  .chair-cell {
+    aspect-ratio: 1;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .chair-cell:hover { transform: scale(1.1); }
+  .chair-cell.filled { background: rgba(37,99,235,0.55); color: rgba(255,255,255,0.9); }
+  .chair-cell.empty { background: var(--surface2); color: var(--muted); }
+  .chair-cell.noshow { background: rgba(220,38,38,0.2); color: rgba(180,20,20,0.9); }
+  .chair-cell.upsell { background: rgba(22,163,74,0.25); color: rgba(14,110,50,0.9); }
+
+  .chair-legend {
+    display: flex;
+    gap: 14px;
+    margin-top: 12px;
+  }
+  .chair-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .chair-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">revenic<span>.</span>ai</div>
+    <div class="logo-sub">Revenue Engine</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Genel Bakış</div>
+    <div class="nav-item active">
+      <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path d="M8 1.5C4.41 1.5 1.5 4.41 1.5 8S4.41 14.5 8 14.5 14.5 11.59 14.5 8 11.59 1.5 8 1.5z" stroke="currentColor" stroke-width="1.3"/><path d="M8 4.5V8l2.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Randevular
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path d="M2 12V5l6-3 6 3v7" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><rect x="5.5" y="8" width="5" height="4.5" rx="0.5" stroke="currentColor" stroke-width="1.3"/></svg>
+      Hastalar
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Gelir</div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path d="M2 11l4-4 3 3 5-6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      LTV Analizi
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Upsell / Cross-sell
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><rect x="1.5" y="3" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 6h13" stroke="currentColor" stroke-width="1.3"/></svg>
+      Bundle Satışlar
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">AI Araçları</div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path d="M8 2l1.5 3 3.5.5-2.5 2.5.5 3.5L8 10l-3 1.5.5-3.5L3 5.5 6.5 5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      AI Tahminler
+    </div>
+    <div class="nav-item">
+      <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Veri İçe Aktar
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="clinic-badge">
+      <div class="clinic-avatar">DS</div>
+      <div>
+        <div class="clinic-name">Dental Studio</div>
+        <div class="clinic-plan">MVP · Pilot</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title">Gelir Paneli</div>
+      <div class="topbar-subtitle">son güncelleme: bugün 09:14</div>
+    </div>
+    <div class="topbar-right">
+      <div class="period-selector">
+        <button class="period-btn">7G</button>
+        <button class="period-btn active">30G</button>
+        <button class="period-btn">90G</button>
+        <button class="period-btn">YTD</button>
+      </div>
+      <div class="ai-pulse">
+        <div class="pulse-dot"></div>
+        AI Aktif
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- AI INSIGHT BANNER -->
+    <div class="ai-banner">
+      <div class="ai-icon">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path d="M8 2l1.5 3 3.5.5-2.5 2.5.5 3.5L8 10l-3 1.5.5-3.5L3 5.5 6.5 5z" fill="#a78bfa"/></svg>
+      </div>
+      <div class="ai-text">
+        <strong>AI Insight:</strong> 7 yüksek-LTV hastanız 90+ gün randevusuz. Hatırlatma gönderilirse tahmini ek gelir: <strong>₺24.800</strong>. Ortalama tedavi kabul oranı bu segmentte %71.
+        <br><span>· Bu ay 3 upsell fırsatı otomatik tespit edildi · No-show riski geçen aya göre ↓%18</span>
+      </div>
+      <button class="ai-action">Hatırlatma Gönder →</button>
+    </div>
+
+    <!-- KPI HERO GRID -->
+    <div class="kpi-grid">
+      <!-- LTV HERO -->
+      <div class="kpi-card hero">
+        <div class="kpi-label">
+          <div class="kpi-dot" style="background:var(--accent2)"></div>
+          Ortalama Hasta LTV
+        </div>
+        <div class="kpi-value">₺18.420</div>
+        <div class="kpi-delta up">↑ +%12.4 <span style="color:var(--muted);font-weight:400">vs geçen ay</span></div>
+        <div class="kpi-sub">Aktif hasta başı · hedef ₺22k</div>
+        <svg class="sparkline" viewBox="0 0 100 50" preserveAspectRatio="none">
+          <polyline points="0,38 14,32 28,35 42,28 56,22 70,18 84,14 100,8" fill="none" stroke="rgba(37,99,235,0.5)" stroke-width="1.5"/>
+          <polyline points="0,38 14,32 28,35 42,28 56,22 70,18 84,14 100,8 100,50 0,50" fill="url(#sparkGrad)" stroke="none"/>
+          <defs><linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(37,99,235,0.25)"/><stop offset="100%" stop-color="rgba(37,99,235,0)"/></linearGradient></defs>
+        </svg>
+      </div>
+
+      <!-- AOV -->
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <div class="kpi-dot" style="background:var(--teal)"></div>
+          Ortalama Sipariş Değeri (AOV)
+        </div>
+        <div class="kpi-value">₺3.240</div>
+        <div class="kpi-delta up">↑ +%8.1</div>
+        <div class="kpi-sub">ziyaret başı</div>
+      </div>
+
+      <!-- CROSS-SELL -->
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <div class="kpi-dot" style="background:var(--green)"></div>
+          Cross-sell Geliri
+        </div>
+        <div class="kpi-value">₺41.600</div>
+        <div class="kpi-delta up">↑ +%23.7</div>
+        <div class="kpi-sub">bu ay · 38 işlem</div>
+      </div>
+
+      <!-- UPSELL -->
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <div class="kpi-dot" style="background:var(--amber)"></div>
+          Upsell Geliri
+        </div>
+        <div class="kpi-value">₺28.950</div>
+        <div class="kpi-delta up">↑ +%15.2</div>
+        <div class="kpi-sub">bu ay · 24 işlem</div>
+      </div>
+
+      <!-- BUNDLE -->
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <div class="kpi-dot" style="background:#f472b6)"></div>
+          Bundle Satış
+        </div>
+        <div class="kpi-value">₺19.400</div>
+        <div class="kpi-delta up">↑ +%31.0</div>
+        <div class="kpi-sub">bu ay · 12 paket</div>
+      </div>
+
+      <!-- HATIRLATMA -->
+      <div class="kpi-card">
+        <div class="kpi-label">
+          <div class="kpi-dot" style="background:var(--muted)"></div>
+          AI Hatırlatma Geliri
+        </div>
+        <div class="kpi-value">₺11.200</div>
+        <div class="kpi-delta up">↑ +%44.8</div>
+        <div class="kpi-sub">geri dönen hasta</div>
+      </div>
+    </div>
+
+    <!-- ROW 1: Revenue Chart + Funnel -->
+    <div class="section-row three-two">
+      <!-- REVENUE TREND -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Gelir Trendi</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="card-badge green">+%18.3 YoY</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap" style="height:200px">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVENUE FUNNEL -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Gelir Breakdown</div>
+          <div class="card-badge purple">Bu Ay</div>
+        </div>
+        <div class="card-body">
+          <div class="funnel-row">
+            <div class="funnel-item">
+              <div class="funnel-label">Temel Tedavi</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:100%;background:rgba(124,92,252,0.6)">%100</div>
+              </div>
+              <div class="funnel-amount">₺98.400</div>
+            </div>
+            <div class="funnel-item">
+              <div class="funnel-label">Cross-sell</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:42%;background:rgba(34,197,94,0.6)">%42</div>
+              </div>
+              <div class="funnel-amount">₺41.600</div>
+            </div>
+            <div class="funnel-item">
+              <div class="funnel-label">Upsell</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:29%;background:rgba(245,158,11,0.6)">%29</div>
+              </div>
+              <div class="funnel-amount">₺28.950</div>
+            </div>
+            <div class="funnel-item">
+              <div class="funnel-label">Bundle</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:20%;background:rgba(244,114,182,0.6)">%20</div>
+              </div>
+              <div class="funnel-amount">₺19.400</div>
+            </div>
+            <div class="funnel-item">
+              <div class="funnel-label">Hatırlatma</div>
+              <div class="funnel-bar-wrap">
+                <div class="funnel-bar" style="width:11%;background:rgba(20,184,166,0.6)">%11</div>
+              </div>
+              <div class="funnel-amount">₺11.200</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:11px;color:#5a6072;font-family:'Inter',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:0.07em">TOPLAM</div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:800;color:#0f1117;letter-spacing:-0.8px">₺199.550</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Chair Occupancy + Opportunities + No-show -->
+    <div class="section-row equal">
+      <!-- KOLTUK DOLULUK -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Koltuk Doluluk</div>
+          <div class="card-badge teal">Bugün · %78</div>
+        </div>
+        <div class="card-body">
+          <div class="chair-grid" id="chairGrid"></div>
+          <div class="chair-legend">
+            <div class="chair-legend-item"><div class="chair-legend-dot" style="background:rgba(124,92,252,0.6)"></div>Dolu</div>
+            <div class="chair-legend-item"><div class="chair-legend-dot" style="background:rgba(34,197,94,0.35)"></div>Upsell</div>
+            <div class="chair-legend-item"><div class="chair-legend-dot" style="background:rgba(239,68,68,0.35)"></div>No-show</div>
+            <div class="chair-legend-item"><div class="chair-legend-dot" style="background:var(--surface2)"></div>Boş</div>
+          </div>
+          <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+            <div class="mini-grid">
+              <div class="mini-card">
+                <div class="mini-label">Toplam Koltuk</div>
+                <div class="mini-value">32</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-label">Dolu</div>
+                <div class="mini-value" style="color:var(--accent2)">25</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-label">No-show</div>
+                <div class="mini-value" style="color:var(--red)">3</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-label">Boş</div>
+                <div class="mini-value" style="color:var(--muted)">4</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI OPPORTUNITIES -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">AI Fırsatlar</div>
+          <div class="card-badge green">₺67.200 potansiyel</div>
+        </div>
+        <div class="card-body" style="padding-top:14px">
+          <div class="opp-list">
+            <div class="opp-item">
+              <div class="opp-icon" style="background:var(--purple-dim)">🦷</div>
+              <div>
+                <div class="opp-title">İmplant Upsell Fırsatı</div>
+                <div class="opp-sub">4 hasta · mevcut tedavi: köprü</div>
+              </div>
+              <div class="opp-amount">
+                <div class="opp-value">₺32.000</div>
+                <div class="opp-label">tahmini</div>
+              </div>
+            </div>
+            <div class="opp-item">
+              <div class="opp-icon" style="background:var(--green-dim)">✨</div>
+              <div>
+                <div class="opp-title">Beyazlatma Bundle</div>
+                <div class="opp-sub">11 hasta · son 6 ay temizlik</div>
+              </div>
+              <div class="opp-amount">
+                <div class="opp-value">₺18.700</div>
+                <div class="opp-label">tahmini</div>
+              </div>
+            </div>
+            <div class="opp-item">
+              <div class="opp-icon" style="background:var(--amber-dim)">📋</div>
+              <div>
+                <div class="opp-title">Ortodonti Değerlendirme</div>
+                <div class="opp-sub">7 hasta · risk skoru yüksek</div>
+              </div>
+              <div class="opp-amount">
+                <div class="opp-value">₺16.500</div>
+                <div class="opp-label">tahmini</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:12px">
+            <div class="alert-strip">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path d="M8 2l6 12H2L8 2z" stroke="#f59e0b" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 7v3M8 11.5v.5" stroke="#f59e0b" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <div class="alert-strip-text"><strong>3 hasta</strong> 90+ gün inaktif — yüksek churn riski</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NO-SHOW ANALİZİ -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">No-show & İptal</div>
+          <div class="card-badge amber">Haftalık</div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;gap:16px;margin-bottom:16px">
+            <div class="mini-card" style="flex:1">
+              <div class="mini-label">No-show Oranı</div>
+              <div class="mini-value" style="color:var(--red)">%9.2</div>
+              <div class="mini-delta" style="color:var(--green)">↓ geçen ay %13.1</div>
+            </div>
+            <div class="mini-card" style="flex:1">
+              <div class="mini-label">Kayıp Gelir</div>
+              <div class="mini-value" style="color:var(--amber)">₺8.640</div>
+              <div class="mini-delta" style="color:var(--green)">↓ ₺3.200 azaldı</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:8px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.06em">Gün bazlı no-show</div>
+            <div class="ns-row"><div class="ns-day">Pzt</div><div class="ns-bar-wrap"><div class="ns-bar" style="width:30%"></div></div><div class="ns-val">3</div></div>
+            <div class="ns-row"><div class="ns-day">Sal</div><div class="ns-bar-wrap"><div class="ns-bar" style="width:20%"></div></div><div class="ns-val">2</div></div>
+            <div class="ns-row"><div class="ns-day">Çar</div><div class="ns-bar-wrap"><div class="ns-bar" style="width:50%"></div></div><div class="ns-val">5</div></div>
+            <div class="ns-row"><div class="ns-day">Per</div><div class="ns-bar-wrap"><div class="ns-bar" style="width:10%"></div></div><div class="ns-val">1</div></div>
+            <div class="ns-row"><div class="ns-day">Cum</div><div class="ns-bar-wrap"><div class="ns-bar" style="width:40%"></div></div><div class="ns-val">4</div></div>
+          </div>
+          <div style="margin-top:14px;padding:10px 12px;background:rgba(220,38,38,0.05);border:1px solid rgba(220,38,38,0.14);border-radius:8px">
+            <div style="font-size:11px;color:var(--red);font-family:'DM Mono',monospace">AI TAHMİN: Çarşamba no-show oranı yüksek. 24s öncesi SMS aktive edilmesi öneriliyor.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 3: Patient Table + Treatment Acceptance -->
+    <div class="section-row two-three">
+      <!-- TREATMENT ACCEPTANCE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Tedavi Kabul Oranı</div>
+          <div class="card-badge green">%68 kabul</div>
+        </div>
+        <div class="card-body">
+          <div class="donut-wrap">
+            <div style="width:120px;height:120px;position:relative;flex-shrink:0">
+              <canvas id="donutChart" width="120" height="120"></canvas>
+              <div class="ring-center">
+                <div class="ring-value">%68</div>
+                <div class="ring-label">kabul</div>
+              </div>
+            </div>
+            <div class="donut-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--accent)"></div>
+                <div class="legend-name">Kabul edildi</div>
+                <div class="legend-pct">%68</div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--amber)"></div>
+                <div class="legend-name">Beklemede</div>
+                <div class="legend-pct">%18</div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--red)"></div>
+                <div class="legend-name">Reddedildi</div>
+                <div class="legend-pct">%14</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px">
+            <div class="mini-grid">
+              <div class="mini-card">
+                <div class="mini-label">Yüksek-LTV Kabul</div>
+                <div class="mini-value" style="color:var(--green)">%81</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-label">Düşük-LTV Kabul</div>
+                <div class="mini-value" style="color:var(--amber)">%52</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HASTA LTV TABLOSU -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Hasta LTV & Fırsatlar</div>
+          <div style="display:flex;gap:8px">
+            <div class="card-badge purple">AI Skorlu</div>
+          </div>
+        </div>
+        <div class="card-body" style="padding-top:0">
+          <table class="apt-table">
+            <thead>
+              <tr>
+                <th>Hasta</th>
+                <th>LTV</th>
+                <th>AOV</th>
+                <th>AI Durum</th>
+                <th>Fırsat</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="patient-name">Ayşe K.</div><div class="patient-meta">12 ziyaret · 3 yıl</div></td>
+                <td><div class="ltv-badge"><div class="ltv-tier" style="background:var(--green)"></div>₺38.200</div></td>
+                <td><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:#0f1117;letter-spacing:-0.3px">₺3.180</div></td>
+                <td><span class="status-pill confirmed">Aktif</span></td>
+                <td><span class="status-pill opportunity">İmplant</span></td>
+              </tr>
+              <tr>
+                <td><div class="patient-name">Mehmet D.</div><div class="patient-meta">8 ziyaret · 2 yıl</div></td>
+                <td><div class="ltv-badge"><div class="ltv-tier" style="background:var(--green)"></div>₺29.400</div></td>
+                <td><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:#0f1117;letter-spacing:-0.3px">₺3.670</div></td>
+                <td><span class="status-pill confirmed">Aktif</span></td>
+                <td><span class="status-pill opportunity">Bundle</span></td>
+              </tr>
+              <tr>
+                <td><div class="patient-name">Zeynep A.</div><div class="patient-meta">6 ziyaret · 18 ay</div></td>
+                <td><div class="ltv-badge"><div class="ltv-tier" style="background:var(--amber)"></div>₺18.900</div></td>
+                <td><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:#0f1117;letter-spacing:-0.3px">₺3.150</div></td>
+                <td><span class="status-pill pending">92 gün</span></td>
+                <td><span class="status-pill opportunity">Hatırlat</span></td>
+              </tr>
+              <tr>
+                <td><div class="patient-name">Ali S.</div><div class="patient-meta">4 ziyaret · 1 yıl</div></td>
+                <td><div class="ltv-badge"><div class="ltv-tier" style="background:var(--amber)"></div>₺14.200</div></td>
+                <td><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:#0f1117;letter-spacing:-0.3px">₺3.550</div></td>
+                <td><span class="status-pill risk">No-show</span></td>
+                <td><span class="status-pill opportunity">Upsell</span></td>
+              </tr>
+              <tr>
+                <td><div class="patient-name">Selin Y.</div><div class="patient-meta">3 ziyaret · 8 ay</div></td>
+                <td><div class="ltv-badge"><div class="ltv-tier" style="background:var(--red)"></div>₺8.100</div></td>
+                <td><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;color:#0f1117;letter-spacing:-0.3px">₺2.700</div></td>
+                <td><span class="status-pill risk">Churn riski</span></td>
+                <td><span class="status-pill pending">Değerlendir</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ── REVENUE CHART ───────────────────────────────────────
+const ctx = document.getElementById('revenueChart').getContext('2d');
+const labels = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'].slice(0,10);
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'Temel Tedavi',
+        data: [62,68,72,69,78,82,88,91,94,98],
+        backgroundColor: 'rgba(37,99,235,0.55)',
+        borderRadius: 4,
+        stack: 'a'
+      },
+      {
+        label: 'Cross-sell',
+        data: [18,22,24,26,28,31,35,37,39,42],
+        backgroundColor: 'rgba(22,163,74,0.5)',
+        borderRadius: 4,
+        stack: 'a'
+      },
+      {
+        label: 'Upsell + Bundle',
+        data: [8,11,14,16,18,22,26,28,30,35],
+        backgroundColor: 'rgba(180,83,9,0.45)',
+        borderRadius: 4,
+        stack: 'a'
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#8a8f9e',
+          font: { size: 10, family: 'DM Mono' },
+          boxWidth: 8,
+          boxHeight: 8,
+          borderRadius: 2
+        }
+      },
+      tooltip: {
+        backgroundColor: '#ffffff',
+        borderColor: 'rgba(0,0,0,0.1)',
+        borderWidth: 1,
+        titleColor: '#1a1d23',
+        bodyColor: '#8a8f9e',
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: ₺${ctx.raw}k`
+        }
+      }
+    },
+    scales: {
+      x: {
+        stacked: true,
+        ticks: { color: '#8a8f9e', font: { size: 10, family: 'DM Mono' } },
+        grid: { display: false }
+      },
+      y: {
+        stacked: true,
+        ticks: { color: '#8a8f9e', font: { size: 10, family: 'DM Mono' }, callback: v => '₺'+v+'k' },
+        grid: { color: 'rgba(0,0,0,0.05)' }
+      }
+    }
+  }
+});
+
+// ── DONUT CHART ─────────────────────────────────────────
+const dCtx = document.getElementById('donutChart').getContext('2d');
+new Chart(dCtx, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      data: [68, 18, 14],
+      backgroundColor: ['rgba(37,99,235,0.75)', 'rgba(180,83,9,0.65)', 'rgba(220,38,38,0.65)'],
+      borderWidth: 0,
+      hoverOffset: 4
+    }]
+  },
+  options: {
+    responsive: false,
+    cutout: '72%',
+    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+  }
+});
+
+// ── CHAIR GRID ───────────────────────────────────────────
+const grid = document.getElementById('chairGrid');
+const states = ['filled','filled','filled','filled','upsell','filled','filled','noshow',
+                 'filled','filled','upsell','filled','empty','filled','noshow','filled',
+                 'filled','upsell','filled','filled','noshow','filled','filled','filled',
+                 'empty','filled','filled','empty','filled','filled','filled','empty'];
+
+states.forEach((s, i) => {
+  const cell = document.createElement('div');
+  cell.className = 'chair-cell ' + s;
+  cell.title = s === 'filled' ? 'Dolu' : s === 'empty' ? 'Boş' : s === 'noshow' ? 'No-show' : 'Upsell yapıldı';
+  cell.textContent = i + 1;
+  grid.appendChild(cell);
+});
+
+// ── PERIOD SELECTOR ──────────────────────────────────────
+document.querySelectorAll('.period-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
