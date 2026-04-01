@@ -1,4 +1,4 @@
-# 🦷 Dentin (Revenic) - Akıllı Klinik Gelir ve Operasyon Motoru
+# 🦷 Revenic - Akıllı Klinik Gelir ve Operasyon Motoru
 
 > Diş kliniklerinde operasyonel yükü hafifleten, no-show oranlarını analiz eden ve geliri maksimize eden yeni nesil SaaS platformu.
 
