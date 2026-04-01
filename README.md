@@ -3,7 +3,7 @@
 > Diş kliniklerinde operasyonel yükü hafifleten, no-show oranlarını analiz eden ve geliri maksimize eden yeni nesil SaaS platformu.
 
 ## 🚀 Proje Hakkında
-Dentin, diş klinikleri için sıradan bir randevu defteri değil; uçtan uca bir klinik yönetim ve gelir optimizasyonu (Revenue Engine) sistemidir. Kliniklerin en büyük kanayan yarası olan "zaman ve gelir kaybını" önlemek amacıyla iki izole arayüzden oluşur:
+Revenic, diş klinikleri için sıradan bir randevu defteri değil; uçtan uca bir klinik yönetim ve gelir optimizasyonu (Revenue Engine) sistemidir. Kliniklerin en büyük kanayan yarası olan "zaman ve gelir kaybını" önlemek amacıyla iki izole arayüzden oluşur:
 
 - **Sekreter Ekranı:** Günlük randevu akışını, hasta kayıtlarını ve operasyonel işleri hızla yöneten, dikkat dağıtmayan karanlık tema odaklı arayüz.
 - **Yönetici (Revenue) Dashboard:** Klinik sahiplerinin LTV (Hasta Yaşam Boyu Değeri), AOV (Ortalama Sipariş Değeri), Upsell fırsatları ve No-show risklerini anlık takip edebileceği, AI destekli analitik kontrol merkezi.
