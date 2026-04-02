@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dentin",
-  description: "Diş klinikleri için randevu yönetimi",
+  title: "Revenic.ai",
+  description: "Diş klinikleri için yapay zeka destekli gelir ve operasyon motoru.",
 };
 
 export default function RootLayout({
