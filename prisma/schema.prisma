@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  SECRETARY
+}
+
+enum AppointmentStatus {
+  PENDING
+  COMPLETED
+  NO_SHOW
+}
+
+enum TreatmentType {
+  BASIC
+  UPSELL
+  CROSS_SELL
+  BUNDLE
+}
+
+model Clinic {
+  id           String         @id @default(cuid())
+  name         String
+  planType     String
+  createdAt    DateTime       @default(now())
+  users        User[]
+  patients     Patient[]
+  appointments Appointment[]
+}
+
+model User {
+  id       String   @id @default(cuid())
+  email    String
+  role     UserRole
+  clinicId String
+  clinic   Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+
+  @@unique([clinicId, email])
+}
+
+model Patient {
+  id           String        @id @default(cuid())
+  firstName    String
+  lastName     String
+  phone        String
+  ltv          Float         @default(0)
+  clinicId     String
+  clinic       Clinic        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+}
+
+model Appointment {
+  id        String            @id @default(cuid())
+  date      DateTime
+  status    AppointmentStatus
+  patientId String
+  clinicId  String
+  patient   Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  clinic    Clinic            @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  treatments Treatment[]
+}
+
+model Treatment {
+  id            String        @id @default(cuid())
+  name          String
+  type          TreatmentType
+  price         Float
+  appointmentId String
+  appointment   Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+}
