@@ -28,6 +28,34 @@ enum TreatmentType {
   BUNDLE
 }
 
+enum PatientEventType {
+  SMS_OPENED
+  LINK_CLICKED
+  APPOINTMENT_CONFIRMED
+  NO_SHOW
+  APPOINTMENT_CANCELLED
+  REMINDER_SENT
+}
+
+enum MessageChannel {
+  SMS
+  WHATSAPP
+  EMAIL
+}
+
+enum MessageQueueStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+}
+
+enum TreatmentRecommendationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
 model Clinic {
   id           String         @id @default(cuid())
   name         String
@@ -49,25 +77,32 @@ model User {
 }
 
 model Patient {
-  id           String        @id @default(cuid())
-  firstName    String
-  lastName     String
-  phone        String
-  ltv          Float         @default(0)
-  clinicId     String
-  clinic       Clinic        @relation(fields: [clinicId], references: [id], onDelete: Cascade)
-  appointments Appointment[]
+  id                      String                   @id @default(cuid())
+  firstName               String
+  lastName                String
+  phone                   String
+  ltv                     Float                    @default(0)
+  noShowScore             Float                    @default(0)
+  totalSessions           Int                      @default(0)
+  totalTreatments         Int                      @default(0)
+  clinicId                String
+  clinic                  Clinic                   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  appointments            Appointment[]
+  patientEvents           PatientEvent[]
+  messageQueues           MessageQueue[]
+  treatmentRecommendations TreatmentRecommendation[]
 }
 
 model Appointment {
-  id        String            @id @default(cuid())
-  date      DateTime
-  status    AppointmentStatus
-  patientId String
-  clinicId  String
-  patient   Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  clinic    Clinic            @relation(fields: [clinicId], references: [id], onDelete: Cascade)
-  treatments Treatment[]
+  id            String         @id @default(cuid())
+  date          DateTime
+  status        AppointmentStatus
+  patientId     String
+  clinicId      String
+  patient       Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  clinic        Clinic         @relation(fields: [clinicId], references: [id], onDelete: Cascade)
+  treatments    Treatment[]
+  messageQueues MessageQueue[]
 }
 
 model Treatment {
@@ -77,4 +112,40 @@ model Treatment {
   price         Float
   appointmentId String
   appointment   Appointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+}
+
+model PatientEvent {
+  id        String           @id @default(cuid())
+  patientId String
+  eventType PatientEventType
+  metadata  Json?
+  createdAt DateTime         @default(now())
+  patient   Patient          @relation(fields: [patientId], references: [id], onDelete: Cascade)
+}
+
+model MessageQueue {
+  id             String             @id @default(cuid())
+  patientId      String
+  appointmentId  String?
+  channel        MessageChannel
+  templateId     String
+  scheduledAt    DateTime
+  status         MessageQueueStatus
+  sentAt         DateTime?
+  responseText   String?
+  createdAt      DateTime           @default(now())
+  patient        Patient            @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  appointment    Appointment?       @relation(fields: [appointmentId], references: [id], onDelete: SetNull)
+}
+
+model TreatmentRecommendation {
+  id                   String                       @id @default(cuid())
+  patientId            String
+  recommendedTreatment String
+  triggerTreatment     String
+  ruleId               String
+  priorityScore        Int
+  status               TreatmentRecommendationStatus
+  createdAt            DateTime                     @default(now())
+  patient              Patient                      @relation(fields: [patientId], references: [id], onDelete: Cascade)
 }
